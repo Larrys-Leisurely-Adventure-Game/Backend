@@ -35,12 +35,40 @@ class Room:
         '''
         return getattr(self, f"{direction}_to")
 
+class Wall:
+    #TODO
 
 class World:
     def __init__(self):
         self.grid = None
         self.width = 0
         self.height = 0
+
+    def depth_first_room_generator(self, size_x, size_y):
+        '''
+        Depth first room generator.
+        '''
+        self.grid = []
+        room_count = 0
+
+        # populate grid with rooms
+        for row in range(size_y):
+            self.grid.append([])
+            for column in range(size_x):
+                if column % 2 == 1 and row % 2 ==1:
+                    room = Room(room_count, "A Generic Room", "This is a generic room.", column, row)
+                    room_count += 1
+                    self.grid[row].append(room)
+                # elif column == 0 or row == 0 or column == size_x -1 or row == size_y -1:
+                #     wall = Wall(#TODO)
+                #     self.grid[row].append(wall)
+                # else:
+                #     wall = Wall(#TODO)
+                #     self.grid[row].append(wall)
+
+
+
+
     def generate_rooms(self, size_x, size_y, num_rooms):
         '''
         Fill up the grid, bottom to top, in a zig-zag pattern
