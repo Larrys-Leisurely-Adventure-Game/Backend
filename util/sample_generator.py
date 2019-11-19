@@ -5,6 +5,8 @@
 # procedural generation algorithm and use print_rooms()
 # to see the world.
 
+import random
+
 
 class Room:
     def __init__(self, id, name, description, x, y):
@@ -46,6 +48,8 @@ class World:
         """
         Calculates the relationship between a new room and the previous room.
         """
+        if previous_room == None:
+            return None
         prev_x = previous_room.x
         prev_y = previous_room.y
 
@@ -83,11 +87,12 @@ class World:
 
                     room = Room(room_count, "A Generic Room", "This is a generic room.", column, row)
 
-                    room_direction = calculate_room_direction(room, previous_room)
+                    
 
                     self.grid[row].append(room)
 
                     if previous_room is not None:
+                        room_direction = self.calculate_room_direction(room, previous_room)
                         previous_room.connect_rooms(room, room_direction)
 
                     # Update iteration variables
@@ -105,37 +110,39 @@ class World:
         h = (len(self.grid) - 1) // 2
         vis = [[0] * w + [1] for _ in range(h)] + [[1] * (w + 1)]
 
-        def walk(x: int, y: int):
+        def walk(x: int, y: int, room_count):
             vis[y][x] = 1
             d = [(x - 1, y), (x, y + 1), (x + 1, y), (x, y - 1)]
             random.shuffle(d)
+            previous_room = None
             for (xx, yy) in d:
                 if vis[yy][xx]:
                     continue
                 if xx == x:
                     room = Room(room_count, "A Generic Room", "This is a generic room.", column, row)
-                    room_direction = calculate_room_direction(room, previous_room)
 
                     self.grid[max(y, yy) * 2][x * 2 + 1] = room
 
                     if previous_room is not None:
+                        room_direction = self.calculate_room_direction(room, previous_room)
                         previous_room.connect_rooms(room, room_direction)
+
                     # Update iteration variables
                     previous_room = room
                     room_count += 1
 
                 if yy == y:
                     room = Room(room_count, "A Generic Room", "This is a generic room.", column, row)
-                    room_direction = calculate_room_direction(room, previous_room)
                     self.grid[y * 2 + 1][max(x, xx) * 2] = room
 
                     if previous_room is not None:
+                        room_direction = self.calculate_room_direction(room, previous_room)
                         previous_room.connect_rooms(room, room_direction)
                     # Update iteration variables
                     previous_room = room
                     room_count += 1
-                walk(xx, yy)
-        walk(random.randrange(w), random.randrange(h))
+                walk(xx, yy, room_count)
+        walk(random.randrange(w), random.randrange(h), room_count)
 
 
 
