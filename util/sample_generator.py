@@ -35,8 +35,6 @@ class Room:
         '''
         return getattr(self, f"{direction}_to")
 
-class Wall:
-    #TODO
 
 class World:
     def __init__(self):
@@ -44,27 +42,102 @@ class World:
         self.width = 0
         self.height = 0
 
+    def calculate_room_direction(self, room, previous_room):
+        """
+        Calculates the relationship between a new room and the previous room.
+        """
+        prev_x = previous_room.x
+        prev_y = previous_room.y
+
+        current_x = room.x
+        current_y = room.y
+
+        if current_x == prev_x:
+            if current_y > prev_y:
+                return 'n'
+            else:
+                return 's'
+        else:
+            if current_x > prev_x:
+                return 'e'
+            else:
+                return 'w'
+       
+
     def depth_first_room_generator(self, size_x, size_y):
         '''
         Depth first room generator.
         '''
         self.grid = []
         room_count = 0
+        previous_room = None
 
         # populate grid with rooms
         for row in range(size_y):
             self.grid.append([])
+
             for column in range(size_x):
-                if column % 2 == 1 and row % 2 ==1:
+
+                if column % 2 == 1 and row % 2 == 1:
+                                     
+
                     room = Room(room_count, "A Generic Room", "This is a generic room.", column, row)
-                    room_count += 1
+
+                    room_direction = calculate_room_direction(room, previous_room)
+
                     self.grid[row].append(room)
-                # elif column == 0 or row == 0 or column == size_x -1 or row == size_y -1:
-                #     wall = Wall(#TODO)
-                #     self.grid[row].append(wall)
-                # else:
-                #     wall = Wall(#TODO)
-                #     self.grid[row].append(wall)
+
+                    if previous_room is not None:
+                        previous_room.connect_rooms(room, room_direction)
+
+                    # Update iteration variables
+                    previous_room = room
+                    room_count += 1
+                elif column == 0 or row == 0 or column == size_x -1 or row == size_y -1:
+                    #wall = Wall(#TODO)
+                    self.grid[row].append(None)
+                else:
+                    #wall = Wall(#TODO)
+                    self.grid[row].append(None)
+
+        # now do a depth first traversal
+        w = (len(self.grid[0]) - 1) // 2
+        h = (len(self.grid) - 1) // 2
+        vis = [[0] * w + [1] for _ in range(h)] + [[1] * (w + 1)]
+
+        def walk(x: int, y: int):
+            vis[y][x] = 1
+            d = [(x - 1, y), (x, y + 1), (x + 1, y), (x, y - 1)]
+            random.shuffle(d)
+            for (xx, yy) in d:
+                if vis[yy][xx]:
+                    continue
+                if xx == x:
+                    room = Room(room_count, "A Generic Room", "This is a generic room.", column, row)
+                    room_direction = calculate_room_direction(room, previous_room)
+
+                    self.grid[max(y, yy) * 2][x * 2 + 1] = room
+
+                    if previous_room is not None:
+                        previous_room.connect_rooms(room, room_direction)
+                    # Update iteration variables
+                    previous_room = room
+                    room_count += 1
+
+                if yy == y:
+                    room = Room(room_count, "A Generic Room", "This is a generic room.", column, row)
+                    room_direction = calculate_room_direction(room, previous_room)
+                    self.grid[y * 2 + 1][max(x, xx) * 2] = room
+
+                    if previous_room is not None:
+                        previous_room.connect_rooms(room, room_direction)
+                    # Update iteration variables
+                    previous_room = room
+                    room_count += 1
+                walk(xx, yy)
+        walk(random.randrange(w), random.randrange(h))
+
+
 
 
 
@@ -183,7 +256,8 @@ w = World()
 num_rooms = 44
 width = 8
 height = 7
-w.generate_rooms(width, height, num_rooms)
+# w.generate_rooms(width, height, num_rooms)
+w.depth_first_room_generator(width, height)
 w.print_rooms()
 
 
