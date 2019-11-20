@@ -19,10 +19,12 @@ class Room:
         self.w_to = None
         self.x = x
         self.y = y
+    
     def __repr__(self):
         if self.e_to is not None:
             return f"({self.x}, {self.y}) -> ({self.e_to.x}, {self.e_to.y})"
         return f"({self.x}, {self.y})"
+    
     def connect_rooms(self, connecting_room, direction):
         '''
         Connect two rooms in the given n/s/e/w direction
@@ -31,6 +33,7 @@ class Room:
         reverse_dir = reverse_dirs[direction]
         setattr(self, f"{direction}_to", connecting_room)
         setattr(connecting_room, f"{reverse_dir}_to", self)
+    
     def get_room_in_direction(self, direction):
         '''
         Connect two rooms in the given n/s/e/w direction
@@ -72,83 +75,87 @@ class World:
         '''
         Depth first room generator.
         '''
-        self.grid = []
-        room_count = 0
-        previous_room = None
+        MAZE_HEIGHT = size_y
+        MAZE_WIDTH = size_x
 
-        # populate grid with rooms
-        for row in range(size_y):
-            self.grid.append([])
+        def _create_grid_with_cells(width, height):
+            """ Create a grid with empty cells on odd row/column combinations. """
+            grid = []
+            for row in range(height):
+                grid.append([])
+                for column in range(width):
+                    if column % 2 == 1 and row % 2 == 1:
+                        grid[row].append((column, row))
+                    elif column == 0 or row == 0 or column == width - 1 or row == height - 1:
+                        grid[row].append(0)
+                    else:
+                        grid[row].append(0)
+            return grid
 
-            for column in range(size_x):
+        def make_maze_depth_first(maze_width, maze_height):
+            maze = _create_grid_with_cells(maze_width, maze_height)
 
-                if column % 2 == 1 and row % 2 == 1:
-                                     
+            w = (len(maze[0]) - 1) // 2
+            h = (len(maze) - 1) // 2
+            vis = [[0] * w + [1] for _ in range(h)] + [[1] * (w + 1)]
 
-                    room = Room(room_count, "A Generic Room", "This is a generic room.", column, row)
+            def walk(x: int, y: int):
+                vis[y][x] = 1
 
-                    
+                d = [(x - 1, y), (x, y + 1), (x + 1, y), (x, y - 1)]
+                random.shuffle(d)
+                for (xx, yy) in d:
+                    if vis[yy][xx]:
+                        continue
+                    if xx == x:
+                        maze[max(y, yy) * 2][x * 2 + 1] = (max(y, yy) * 2, x * 2 + 1)
+                    if yy == y:
+                        maze[y * 2 + 1][max(x, xx) * 2] = (y * 2 + 1, max(x, xx) * 2)
 
-                    self.grid[row].append(room)
+                    walk(xx, yy)
 
-                    if previous_room is not None:
-                        room_direction = self.calculate_room_direction(room, previous_room)
-                        previous_room.connect_rooms(room, room_direction)
+            walk(random.randrange(w), random.randrange(h))
 
-                    # Update iteration variables
-                    previous_room = room
-                    room_count += 1
-                elif column == 0 or row == 0 or column == size_x -1 or row == size_y -1:
-                    #wall = Wall(#TODO)
-                    self.grid[row].append(None)
-                else:
-                    #wall = Wall(#TODO)
-                    self.grid[row].append(None)
+            return maze
 
-        # now do a depth first traversal
-        w = (len(self.grid[0]) - 1) // 2
-        h = (len(self.grid) - 1) // 2
-        vis = [[0] * w + [1] for _ in range(h)] + [[1] * (w + 1)]
+        # create a grid of coords and 0s that can be populated with rooms
+        self.grid = make_maze_depth_first(MAZE_WIDTH, MAZE_HEIGHT)
 
-        def walk(x: int, y: int, room_count):
-            vis[y][x] = 1
-            d = [(x - 1, y), (x, y + 1), (x + 1, y), (x, y - 1)]
-            random.shuffle(d)
-            previous_room = None
-            for (xx, yy) in d:
-                if vis[yy][xx]:
-                    continue
-                if xx == x:
-                    room = Room(room_count, "A Generic Room", "This is a generic room.", column, row)
+        def populate_maze():
+            """ Traverses the maze object and turns 1s into rooms then connects them"""
+            room_count = 0
 
-                    self.grid[max(y, yy) * 2][x * 2 + 1] = room
+            for row in self.grid:
+                for column in row:
+                    if column == 0:
+                        pass
+                    else:
+                        # generate room
+                        x = column[0] - 1
+                        y = column[1] - 1
+                        print(x,y, len(self.grid))
 
-                    if previous_room is not None:
-                        room_direction = self.calculate_room_direction(room, previous_room)
-                        previous_room.connect_rooms(room, room_direction)
+                        room = Room(room_count, "A Generic Room", "This is a generic room.", x, y)
 
-                    # Update iteration variables
-                    previous_room = room
-                    room_count += 1
+                        self.grid[x][y] = room
+                        room_count += 1
+            # Now we have filled the grid with rooms, we connect them
+            for i in range(self.grid):
+                for j in range(len(self.grid[i])):
+                    if self.grid[i][j] == 0:
+                        pass
+                    else:
+                        #scan nearby rooms and connect them
+                        adj_rooms = [(i-1, j), (i + 1, j), (i, j-1), (i, j+1)]
+                        for room in adj_rooms:
+                            if (room[0] in range(self.grid)) and (room[1] in range(len(self.grid[i]))):
 
-                if yy == y:
-                    room = Room(room_count, "A Generic Room", "This is a generic room.", column, row)
-                    self.grid[y * 2 + 1][max(x, xx) * 2] = room
-
-                    if previous_room is not None:
-                        room_direction = self.calculate_room_direction(room, previous_room)
-                        previous_room.connect_rooms(room, room_direction)
-                    # Update iteration variables
-                    previous_room = room
-                    room_count += 1
-                walk(xx, yy, room_count)
-        walk(random.randrange(w), random.randrange(h), room_count)
-
-
-
-
-
-
+                                if self.grid[room[0]][room[1]] != 0:
+                                    direction = self.calculate_room_direction(self.grid[i][j], self.grid[room[0]][room[1]])
+                                    self.grid[room[0]][room[1]].connect_rooms(self.grid[i][j], direction)
+        
+        populate_maze()
+        
     def generate_rooms(self, size_x, size_y, num_rooms):
         '''
         Fill up the grid, bottom to top, in a zig-zag pattern
@@ -265,7 +272,12 @@ width = 8
 height = 7
 # w.generate_rooms(width, height, num_rooms)
 w.depth_first_room_generator(width, height)
-w.print_rooms()
+# w.print_rooms()
 
 
 print(f"\n\nWorld\n  height: {height}\n  width: {width},\n  num_rooms: {num_rooms}\n")
+print(w.grid)
+
+print(type(w.grid))
+
+print(w.populate_maze())
