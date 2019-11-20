@@ -90,6 +90,8 @@ class World:
                         grid[row].append(0)
                     else:
                         grid[row].append(0)
+            for line in grid:
+                print(line)
             return grid
 
         def make_maze_depth_first(maze_width, maze_height):
@@ -115,6 +117,9 @@ class World:
                     walk(xx, yy)
 
             walk(random.randrange(w), random.randrange(h))
+
+            for line in maze:
+                print(line)
 
             return maze
 
@@ -269,7 +274,7 @@ class World:
 
 w = World()
 num_rooms = 44
-width = 8
+width = 7
 height = 7
 # w.generate_rooms(width, height, num_rooms)
 w.depth_first_room_generator(width, height)
