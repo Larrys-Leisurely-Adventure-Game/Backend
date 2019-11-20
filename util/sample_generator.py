@@ -125,32 +125,33 @@ class World:
             """ Traverses the maze object and turns 1s into rooms then connects them"""
             room_count = 0
 
-            for row in self.grid:
-                for column in row:
-                    if column == 0:
-                        pass
+            for i in range(len(self.grid)):
+                for j in range(len(self.grid[i])):
+                    if self.grid[i][j] == 0:
+                        self.grid[i][j] = None
                     else:
                         # generate room
-                        x = column[0] - 1
-                        y = column[1] - 1
+                        x = self.grid[i][j][0] - 1
+                        y = self.grid[i][j][1] - 1
                         print(x,y, len(self.grid))
 
                         room = Room(room_count, "A Generic Room", "This is a generic room.", x, y)
 
-                        self.grid[x][y] = room
+                        self.grid[i][j] = room
                         room_count += 1
+
             # Now we have filled the grid with rooms, we connect them
-            for i in range(self.grid):
+            for i in range(len(self.grid)):
                 for j in range(len(self.grid[i])):
-                    if self.grid[i][j] == 0:
+                    if self.grid[i][j] == None:
                         pass
                     else:
                         #scan nearby rooms and connect them
                         adj_rooms = [(i-1, j), (i + 1, j), (i, j-1), (i, j+1)]
                         for room in adj_rooms:
-                            if (room[0] in range(self.grid)) and (room[1] in range(len(self.grid[i]))):
+                            if (room[0] in range(len(self.grid))) and (room[1] in range(len(self.grid[i]))):
 
-                                if self.grid[room[0]][room[1]] != 0:
+                                if self.grid[room[0]][room[1]] != None:
                                     direction = self.calculate_room_direction(self.grid[i][j], self.grid[room[0]][room[1]])
                                     self.grid[room[0]][room[1]].connect_rooms(self.grid[i][j], direction)
         
@@ -272,12 +273,11 @@ width = 8
 height = 7
 # w.generate_rooms(width, height, num_rooms)
 w.depth_first_room_generator(width, height)
-# w.print_rooms()
+w.print_rooms()
 
 
 print(f"\n\nWorld\n  height: {height}\n  width: {width},\n  num_rooms: {num_rooms}\n")
-print(w.grid)
+for line in w.grid:
+    print(line)
 
 print(type(w.grid))
-
-print(w.populate_maze())
