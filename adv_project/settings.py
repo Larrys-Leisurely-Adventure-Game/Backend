@@ -121,6 +121,9 @@ REST_FRAMEWORK = {
     # 'DEFAULT_PERMISSION_CLASSES': [
     #     'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly',
     # ],
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.isAuthenticated',
+    ],
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework.authentication.BasicAuthentication',
         'rest_framework.authentication.SessionAuthentication',
@@ -153,4 +156,4 @@ STATIC_URL = '/static/'
 import django_heroku
 django_heroku.settings(locals())
 
-# del DATABASES['default']['OPTIONS']['sslmode'] # <-- Add this line
+del DATABASES['default']['OPTIONS']['sslmode'] # <-- Add this line
