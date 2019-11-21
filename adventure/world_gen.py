@@ -38,6 +38,7 @@ class World:
         self.grid = None
         self.width = 0
         self.height = 0
+        self.rooms = {}
 
     def calculate_room_direction(self, room, previous_room):
         """
@@ -133,9 +134,14 @@ class World:
 
                         room = Room(room_count, "A Generic Room", "This is a generic room.", x, y)
                         
+                        
+                        
                         # print(f'creating room {room_count}')
                         
+                        # save the room in the grid and in a dict
                         self.grid[i][j] = room
+                        self.rooms[room_count] = room
+                        
                         room_count += 1
 
             # Now we have filled the grid with rooms, we connect them

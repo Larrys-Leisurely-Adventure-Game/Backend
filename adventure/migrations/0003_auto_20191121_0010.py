@@ -31,7 +31,7 @@ def populate_database(apps, schema_editor):
                 # It's a room object! let's put it into the database!
                 obj = w.grid[i][j]
 
-                print(f'obj id {obj.id}')
+                # print(f'obj id {obj.id}')
 
                 new_room = Room(id = obj.id, title = obj.name, description = obj.description)
                 
@@ -66,7 +66,7 @@ def populate_database(apps, schema_editor):
 
         # [print(room.id) for room in rooms]
 
-        Room.objects.using(db_alias).bulk_create(rooms)
+    Room.objects.using(db_alias).bulk_create(rooms)
 
 
 class Migration(migrations.Migration):
