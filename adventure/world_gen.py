@@ -1,4 +1,5 @@
 import random
+from .description_generator import gen_room_desc
 
 class Room:
     def __init__(self, id, name, description, x, y):
@@ -120,6 +121,7 @@ class World:
         def populate_maze():
             """ Traverses the maze object and turns 1s into rooms then connects them"""
             room_count = 1
+            room_descriptions = gen_room_desc()
 
             for i in range(len(self.grid)):
                 for j in range(len(self.grid[i])):
@@ -132,12 +134,11 @@ class World:
                         
                         # print(x,y, len(self.grid))
 
-                        room = Room(room_count, "A Generic Room", "This is a generic room.", x, y)
-                        
-                        
-                        
-                        # print(f'creating room {room_count}')
-                        
+                        # get a description
+                        desc = room_descriptions.pop()
+
+                        room = Room(room_count, desc['name'], desc['desc'], x, y)
+            
                         # save the room in the grid and in a dict
                         self.grid[i][j] = room
                         self.rooms[room_count] = room
@@ -166,6 +167,8 @@ class World:
 #### Usage Example ####
 
 # w = World()
-# width = 51
-# height = 51
+# width = 11
+# height = 11
 # w.depth_first_room_generator(width, height)
+# for line in w.grid:
+#     print(line)
