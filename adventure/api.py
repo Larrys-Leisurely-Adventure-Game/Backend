@@ -34,6 +34,7 @@ def initialize(request):
 
     return JsonResponse({'uuid': uuid, 
                          'name':player.user.username, 
+                         'id': room.id,
                          'title':room.title, 
                          'description':room.description, 
                          'players':players,
