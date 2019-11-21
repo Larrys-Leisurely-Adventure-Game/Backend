@@ -20,7 +20,8 @@ def initialize(request):
     uuid = player.uuid
     room = player.room()
     players = room.playerNames(player_id)
-    world = Room.objects.all()
+    world = room.objects.all()
+    # Room.objects.all()
     return JsonResponse({'uuid': uuid, 
                          'name':player.user.username, 
                          'title':room.title, 
