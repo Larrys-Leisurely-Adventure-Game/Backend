@@ -1,12 +1,4 @@
-# Sample Python code that can be used to generate rooms in
-# a zig-zag pattern.
-#
-# You can modify generate_rooms() to create your own
-# procedural generation algorithm and use print_rooms()
-# to see the world.
-
 import random
-
 
 class Room:
     def __init__(self, id, name, description, x, y):
@@ -46,6 +38,7 @@ class World:
         self.grid = None
         self.width = 0
         self.height = 0
+        self.rooms = {}
 
     def calculate_room_direction(self, room, previous_room):
         """
@@ -90,8 +83,6 @@ class World:
                         grid[row].append(0)
                     else:
                         grid[row].append(0)
-            for line in grid:
-                print(line)
             return grid
 
         def make_maze_depth_first(maze_width, maze_height):
@@ -128,7 +119,7 @@ class World:
 
         def populate_maze():
             """ Traverses the maze object and turns 1s into rooms then connects them"""
-            room_count = 0
+            room_count = 1
 
             for i in range(len(self.grid)):
                 for j in range(len(self.grid[i])):
@@ -138,11 +129,19 @@ class World:
                         # generate room
                         x = self.grid[i][j][0] - 1
                         y = self.grid[i][j][1] - 1
-                        print(x,y, len(self.grid))
+                        
+                        # print(x,y, len(self.grid))
 
                         room = Room(room_count, "A Generic Room", "This is a generic room.", x, y)
-
+                        
+                        
+                        
+                        # print(f'creating room {room_count}')
+                        
+                        # save the room in the grid and in a dict
                         self.grid[i][j] = room
+                        self.rooms[room_count] = room
+                        
                         room_count += 1
 
             # Now we have filled the grid with rooms, we connect them
@@ -159,131 +158,14 @@ class World:
                                 if self.grid[room[0]][room[1]] != None:
                                     direction = self.calculate_room_direction(self.grid[i][j], self.grid[room[0]][room[1]])
                                     self.grid[room[0]][room[1]].connect_rooms(self.grid[i][j], direction)
+            
             print(f'room count {room_count}')
         
         populate_maze()
-        
-    # def generate_rooms(self, size_x, size_y, num_rooms):
-    #     '''
-    #     Fill up the grid, bottom to top, in a zig-zag pattern
-    #     '''
 
-    #     # Initialize the grid
-    #     self.grid = [None] * size_y
-    #     self.width = size_x
-    #     self.height = size_y
-    #     for i in range( len(self.grid) ):
-    #         self.grid[i] = [None] * size_x
+#### Usage Example ####
 
-    #     # Start from lower-left corner (0,0)
-    #     x = -1 # (this will become 0 on the first step)
-    #     y = 0
-    #     room_count = 0
-
-    #     # Start generating rooms to the east
-    #     direction = 1  # 1: east, -1: west
-
-
-    #     # While there are rooms to be created...
-    #     previous_room = None
-    #     while room_count < num_rooms:
-
-    #         # Calculate the direction of the room to be created
-    #         if direction > 0 and x < size_x - 1:
-    #             room_direction = "e"
-    #             x += 1
-    #         elif direction < 0 and x > 0:
-    #             room_direction = "w"
-    #             x -= 1
-    #         else:
-    #             # If we hit a wall, turn north and reverse direction
-    #             room_direction = "n"
-    #             y += 1
-    #             direction *= -1
-
-    #         # Create a room in the given direction
-    #         room = Room(room_count, "A Generic Room", "This is a generic room.", x, y)
-    #         # Note that in Django, you'll need to save the room after you create it
-
-    #         # Save the room in the World grid
-    #         self.grid[y][x] = room
-
-    #         # Connect the new room to the previous room
-    #         if previous_room is not None:
-    #             previous_room.connect_rooms(room, room_direction)
-
-    #         # Update iteration variables
-    #         previous_room = room
-    #         room_count += 1
-
-
-
-    def print_rooms(self):
-        '''
-        Print the rooms in room_grid in ascii characters.
-        '''
-
-        # Add top border
-        str = "# " * ((3 + self.width * 5) // 2) + "\n"
-
-        # The console prints top to bottom but our array is arranged
-        # bottom to top.
-        #
-        # We reverse it so it draws in the right direction.
-        reverse_grid = list(self.grid) # make a copy of the list
-        reverse_grid.reverse()
-        for row in reverse_grid:
-            # PRINT NORTH CONNECTION ROW
-            str += "#"
-            for room in row:
-                if room is not None and room.n_to is not None:
-                    str += "  |  "
-                else:
-                    str += "     "
-            str += "#\n"
-            # PRINT ROOM ROW
-            str += "#"
-            for room in row:
-                if room is not None and room.w_to is not None:
-                    str += "-"
-                else:
-                    str += " "
-                if room is not None:
-                    str += f"{room.id}".zfill(3)
-                else:
-                    str += "   "
-                if room is not None and room.e_to is not None:
-                    str += "-"
-                else:
-                    str += " "
-            str += "#\n"
-            # PRINT SOUTH CONNECTION ROW
-            str += "#"
-            for room in row:
-                if room is not None and room.s_to is not None:
-                    str += "  |  "
-                else:
-                    str += "     "
-            str += "#\n"
-
-        # Add bottom border
-        str += "# " * ((3 + self.width * 5) // 2) + "\n"
-
-        # Print string
-        print(str)
-
-
-w = World()
-# num_rooms = 44
-width = 51
-height = 51
-# w.generate_rooms(width, height, num_rooms)
-w.depth_first_room_generator(width, height)
-# w.print_rooms()
-
-
-print(f"\n\nWorld\n  height: {height}\n  width: {width},\n  num_rooms: {num_rooms}\n")
-for line in w.grid:
-    print(line)
-
-print(type(w.grid))
+# w = World()
+# width = 51
+# height = 51
+# w.depth_first_room_generator(width, height)
