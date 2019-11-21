@@ -1,4 +1,4 @@
-import random
+import random, json
 
 def gen_room_desc():
         
@@ -83,8 +83,10 @@ def gen_room_desc():
             "desc" : f"{c['desc']}{b['desc']}{a['desc']}"
         }
 
-        if hash(new_room) not in hashes:
-            hashes.add(hash(new_room))
-            room_info.append()
+        new_hash = hash(json.dumps(new_room))
+
+        if new_hash not in hashes:
+            hashes.add(new_hash)
+            room_info.append(new_room)
     
     return room_info

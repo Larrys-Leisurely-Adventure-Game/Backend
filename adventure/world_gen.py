@@ -1,5 +1,5 @@
 import random
-from .description_generator import gen_room_desc
+from description_generator import gen_room_desc
 
 class Room:
     def __init__(self, id, name, description, x, y):
