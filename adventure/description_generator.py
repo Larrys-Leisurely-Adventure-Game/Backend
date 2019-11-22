@@ -72,7 +72,9 @@ def gen_room_desc():
     room_info = []
     hashes = set()
 
-    while len(room_info) < 1249:
+    # print(f'random descriptions {len(room_attr_a) * len(room_attr_b) * len(room_attr_c)}')
+
+    while len(room_info) < 512:
         
         a = random.choice(room_attr_a)
         b = random.choice(room_attr_b)
@@ -90,3 +92,4 @@ def gen_room_desc():
             room_info.append(new_room)
     
     return room_info
+

@@ -167,8 +167,8 @@ class World:
 #### Usage Example ####
 
 # w = World()
-# width = 11
-# height = 11
+# width = 33
+# height = 33
 # w.depth_first_room_generator(width, height)
-# for line in w.grid:
+# # for line in w.grid:
 #     print(line)
