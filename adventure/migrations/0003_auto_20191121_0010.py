@@ -12,8 +12,10 @@ def populate_database(apps, schema_editor):
     rooms = []
 
     w = World()
-    width = 51
-    height = 51
+    
+    #33 *33 creates 512 rooms
+    width = 33
+    height = 33
     w.depth_first_room_generator(width, height)
 
     # ids = []
